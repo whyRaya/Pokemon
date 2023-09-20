@@ -2,14 +2,7 @@ package com.whyraya.pokemon.ui.screen.home
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Icon
@@ -27,10 +20,11 @@ import androidx.compose.ui.unit.sp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.whyraya.pokemon.model.dto.PokemonDto
+import com.whyraya.pokemon.ui.screen.common.PokeBall
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun PokeDexCard(
+fun PokemonCard(
     modifier: Modifier = Modifier,
     pokemon: PokemonDto,
     isFavorite: Boolean = false,
@@ -51,7 +45,7 @@ fun PokeDexCard(
                 PokemonName(pokemon.name)
             }
             Text(
-                text = pokemon.id.toString(),
+                text = pokemon.formatId,
                 fontWeight = FontWeight.Bold,
                 fontSize = 14.sp,
                 modifier = Modifier
@@ -61,14 +55,13 @@ fun PokeDexCard(
                         alpha = 0.5f
                     },
             )
-//            PokeBall(
-//                Modifier
-//                    .align(Alignment.BottomEnd)
-//                    .offset(x = 5.dp, y = 10.dp)
-//                    .requiredSize(96.dp),
-//                Color.White,
-//                0.25f
-//            )
+            PokeBall(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .offset(x = 5.dp, y = 10.dp)
+                    .requiredSize(96.dp),
+                alpha = 0.25f
+            )
 
             GlideImage(
                 model = pokemon.imageUrl,
@@ -103,9 +96,10 @@ private fun PokemonName(name: String?) {
 @Preview(uiMode = UI_MODE_NIGHT_YES)
 @Preview
 @Composable
-private fun PokeDexCardPreview() {
+private fun PokemonCardPreview() {
     val pokemon = PokemonDto(
         id = 1,
+        formatId = "001",
         name = "Bulbasaur",
         url = "https://pokeapi.co/api/v2/pokemon/1/",
         imageUrl = "https://assets.pokemon.com/assets/cms2/img/pokedex/full/001/png"
@@ -115,15 +109,11 @@ private fun PokeDexCardPreview() {
             Modifier.width(200.dp),
             verticalArrangement = Arrangement.spacedBy(5.dp)
         ) {
-            PokeDexCard(
+            PokemonCard(
                 modifier = Modifier.fillMaxWidth(),
                 pokemon = pokemon
             )
-            PokeDexCard(
-                modifier = Modifier.fillMaxWidth(),
-                pokemon = pokemon
-            )
-            PokeDexCard(
+            PokemonCard(
                 modifier = Modifier.fillMaxWidth(),
                 pokemon = pokemon
             )

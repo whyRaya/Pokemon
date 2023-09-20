@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Pokemon</string>
     <string name="app_loading">Loading…</string>
+    <string name="app_pokemon_id">#%s</string>
+    <string name="app_pokemon_moves">Moves</string>
+    <string name="app_pokemon_level">Lv%1s: %2s</string>
 </resources>

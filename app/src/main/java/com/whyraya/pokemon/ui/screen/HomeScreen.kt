@@ -1,7 +1,6 @@
 package com.whyraya.pokemon.ui.screen
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -26,7 +25,12 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.whyraya.pokemon.R
 import com.whyraya.pokemon.model.dto.PokemonDto
-import com.whyraya.pokemon.ui.screen.home.PokeDexCard
+import com.whyraya.pokemon.ui.screen.common.ErrorColumn
+import com.whyraya.pokemon.ui.screen.common.ErrorRow
+import com.whyraya.pokemon.ui.screen.common.LoadingColumn
+import com.whyraya.pokemon.ui.screen.common.LoadingRow
+import com.whyraya.pokemon.ui.screen.common.toDp
+import com.whyraya.pokemon.ui.screen.home.PokemonCard
 
 private const val COLUMN_COUNT = 2
 private val GRID_SPACING = 8.dp
@@ -36,7 +40,7 @@ private val span: (LazyGridItemSpanScope) -> GridItemSpan = { GridItemSpan(COLUM
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun HomeScreen() {
-    val viewModel: HomeViewModel = hiltViewModel()
+    val viewModel: PokemonHomeViewModel = hiltViewModel()
     val pokemon = viewModel.pokemon.collectAsLazyPagingItems()
     val state = rememberLazyGridState()
 
@@ -65,7 +69,6 @@ fun HomeScreen() {
 
 @Composable
 private fun LazyMoviesGrid(state: LazyGridState, pokemonPagingItems: LazyPagingItems<PokemonDto>) {
-    Log.e("POKEMON", "state: $state")
     LazyVerticalGrid(
         columns = GridCells.Fixed(COLUMN_COUNT),
         contentPadding = PaddingValues(
@@ -86,7 +89,7 @@ private fun LazyMoviesGrid(state: LazyGridState, pokemonPagingItems: LazyPagingI
             }
             items(pokemonPagingItems.itemCount) { index ->
                 val pokemon = pokemonPagingItems.peek(index) ?: return@items
-                PokeDexCard(pokemon = pokemon)
+                PokemonCard(pokemon = pokemon)
             }
             renderLoading(pokemonPagingItems.loadState)
             renderError(pokemonPagingItems.loadState)
