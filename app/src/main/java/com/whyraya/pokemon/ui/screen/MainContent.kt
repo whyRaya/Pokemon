@@ -3,7 +3,6 @@ package com.whyraya.pokemon.ui.screen
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.graphics.BlendMode.Companion.Screen
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
@@ -12,54 +11,32 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
+import com.whyraya.pokemon.ui.navigation.DETAIL_ROUTE
+import com.whyraya.pokemon.ui.navigation.POKEMON_ID
+import com.whyraya.pokemon.ui.navigation.Screen
 
 val LocalNavController = compositionLocalOf<NavHostController> { error("No nav controller") }
 val LocalDarkTheme = compositionLocalOf { mutableStateOf(false) }
 
-//@Composable
-//fun MainContent() {
-//    val navController = LocalNavController.current
-//    NavHost(navController = navController, startDestination = Screen.GENRES.route) {
-//        composable(Screen.GENRES.route) { MovieGenreScreen() }
-//
-//        navigation(startDestination = Screen.MOVIES.route, route = MOVIES_ROUTE) {
-//            navArgument(GENRE_ID) { type = NavType.IntType }
-//
-//            fun NavBackStackEntry.genreId(): Int {
-//                return arguments?.getInt(GENRE_ID)!!
-//            }
-//
-//            val moviesViewModel: @Composable (movieId: Int) -> MoviesViewModel = { hiltViewModel() }
-//
-//            composable(route = Screen.MOVIES.route) {
-//                MoviesScreen(moviesViewModel(it.genreId()))
-//            }
-//        }
-//
-//        navigation(startDestination = Screen.DETAIL.route, route = MOVIE_ROUTE) {
-//            navArgument(MOVIE_ID) { type = NavType.IntType }
-//
-//            fun NavBackStackEntry.movieId(): Int {
-//                return arguments?.getInt(MOVIE_ID)!!
-//            }
-//
-//            val movieDetailViewModel: @Composable (movieId: Int) -> MovieDetailViewModel =
-//                { hiltViewModel() }
-//
-//            composable(route = Screen.DETAIL.route) {
-//                MovieDetailScreen(movieDetailViewModel(it.movieId()))
-//            }
-//        }
-//
-//        navigation(startDestination = Screen.YOUTUBE.route, route = YOUTUBE_ROUTE) {
-//            navArgument(YOUTUBE_KEY) { type = NavType.StringType }
-//
-//            fun NavBackStackEntry.youtubeUrl(): String {
-//                return arguments?.getString(YOUTUBE_KEY)!!
-//            }
-//            composable(route = Screen.YOUTUBE.route) {
-//                VideoScreen(it.youtubeUrl())
-//            }
-//        }
-//    }
-//}
+@Composable
+fun MainContent() {
+    val navController = LocalNavController.current
+    NavHost(navController = navController, startDestination = Screen.HOME.route) {
+        composable(Screen.HOME.route) { PokemonHomeScreen() }
+
+        navigation(startDestination = Screen.DETAIL.route, route = DETAIL_ROUTE) {
+            navArgument(POKEMON_ID) { type = NavType.IntType }
+
+            fun NavBackStackEntry.pokemonId(): Int {
+                return arguments?.getInt(POKEMON_ID)!!
+            }
+
+            val pokemonDetailViewModel: @Composable (movieId: Int) -> PokemonDetailViewModel =
+                { hiltViewModel() }
+
+            composable(route = Screen.DETAIL.route) {
+                PokemonDetailScreen(pokemonDetailViewModel(it.pokemonId()))
+            }
+        }
+    }
+}

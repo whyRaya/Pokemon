@@ -25,6 +25,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.whyraya.pokemon.R
 import com.whyraya.pokemon.model.dto.PokemonDto
+import com.whyraya.pokemon.ui.navigation.Screen
 import com.whyraya.pokemon.ui.screen.common.ErrorColumn
 import com.whyraya.pokemon.ui.screen.common.ErrorRow
 import com.whyraya.pokemon.ui.screen.common.LoadingColumn
@@ -39,7 +40,7 @@ private val span: (LazyGridItemSpanScope) -> GridItemSpan = { GridItemSpan(COLUM
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun HomeScreen() {
+fun PokemonHomeScreen() {
     val viewModel: PokemonHomeViewModel = hiltViewModel()
     val pokemon = viewModel.pokemon.collectAsLazyPagingItems()
     val state = rememberLazyGridState()
@@ -69,6 +70,7 @@ fun HomeScreen() {
 
 @Composable
 private fun LazyMoviesGrid(state: LazyGridState, pokemonPagingItems: LazyPagingItems<PokemonDto>) {
+    val navController = LocalNavController.current
     LazyVerticalGrid(
         columns = GridCells.Fixed(COLUMN_COUNT),
         contentPadding = PaddingValues(
@@ -89,7 +91,9 @@ private fun LazyMoviesGrid(state: LazyGridState, pokemonPagingItems: LazyPagingI
             }
             items(pokemonPagingItems.itemCount) { index ->
                 val pokemon = pokemonPagingItems.peek(index) ?: return@items
-                PokemonCard(pokemon = pokemon)
+                PokemonCard(pokemon = pokemon) {
+                    navController.navigate(Screen.DETAIL.createPath(pokemon.id))
+                }
             }
             renderLoading(pokemonPagingItems.loadState)
             renderError(pokemonPagingItems.loadState)

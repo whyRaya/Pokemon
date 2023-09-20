@@ -25,7 +25,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.whyraya.pokemon.R
@@ -39,8 +38,7 @@ val LocalVibrantColor =
     compositionLocalOf<Animatable<Color, AnimationVector4D>> { error("No vibrant color defined") }
 
 @Composable
-fun MovieDetailScreen() {
-    val viewModel: PokemonDetailViewModel = hiltViewModel()
+fun PokemonDetailScreen(viewModel: PokemonDetailViewModel) {
     val uiState = viewModel.uiState.collectAsState().value
     when {
         uiState.loading -> LoadingColumn(stringResource(id = R.string.app_loading))

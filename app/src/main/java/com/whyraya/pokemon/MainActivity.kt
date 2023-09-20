@@ -3,27 +3,34 @@ package com.whyraya.pokemon
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.ui.Modifier
-import com.whyraya.pokemon.ui.screen.HomeScreen
-import com.whyraya.pokemon.ui.screen.MovieDetailScreen
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.core.view.WindowCompat
+import androidx.navigation.compose.rememberNavController
+import com.whyraya.pokemon.ui.screen.LocalDarkTheme
+import com.whyraya.pokemon.ui.screen.LocalNavController
+import com.whyraya.pokemon.ui.screen.MainContent
 import com.whyraya.pokemon.ui.theme.PokemonTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, true)
         setContent {
-            PokemonTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+            val systemTheme = isSystemInDarkTheme()
+            val isDarkTheme = remember { mutableStateOf(systemTheme) }
+            val navController = rememberNavController()
+            PokemonTheme(darkTheme = isDarkTheme.value) {
+                CompositionLocalProvider(
+                    LocalNavController provides navController,
+                    LocalDarkTheme provides isDarkTheme,
                 ) {
-                    MovieDetailScreen()
+                    MainContent()
                 }
             }
         }
