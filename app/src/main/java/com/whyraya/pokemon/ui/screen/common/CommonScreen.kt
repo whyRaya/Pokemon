@@ -2,18 +2,24 @@ package com.whyraya.pokemon.ui.screen.common
 
 
 import android.content.res.Configuration
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.NightsStay
+import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -27,11 +33,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.whyraya.pokemon.R
-import com.whyraya.pokemon.model.dto.PokemonDto
-import com.whyraya.pokemon.ui.screen.home.PokemonCard
+import com.whyraya.pokemon.ui.screen.LocalDarkTheme
+import com.whyraya.pokemon.ui.screen.LocalNavController
+import com.whyraya.pokemon.ui.screen.LocalVibrantColor
 
 
 @Composable
@@ -140,6 +149,41 @@ private fun PokemonCardPreview() {
         ) {
             LoadingColumn(title = stringResource(id = R.string.app_loading))
             LoadingRow(title = stringResource(id = R.string.app_loading))
+        }
+    }
+}
+
+@Composable
+fun PokemonAppBar(title: String) {
+    val navController = LocalNavController.current
+    val colors = androidx.compose.material.MaterialTheme.colors
+    val isDarkTheme = LocalDarkTheme.current
+    val iconTint =
+        animateColorAsState(
+            if (isDarkTheme.value) colors.onSurface else colors.primary,
+            label = "appIconTint"
+        ).value
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .height(50.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        IconButton(
+            onClick = { navController.popBackStack() }) {
+            Icon(Icons.Default.ArrowBack, contentDescription = "", tint = iconTint)
+        }
+        Text(
+            text = title,
+            style = androidx.compose.material.MaterialTheme.typography.h5.copy(
+                fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily.SansSerif
+            ),
+        )
+        val icon = if (isDarkTheme.value) Icons.Default.NightsStay else Icons.Default.WbSunny
+        IconButton(onClick = { isDarkTheme.value = !isDarkTheme.value }) {
+            Icon(icon, contentDescription = null, tint = iconTint)
         }
     }
 }

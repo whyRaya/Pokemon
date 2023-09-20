@@ -1,5 +1,6 @@
 package com.whyraya.pokemon.ui.screen
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.Animatable
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector4D
@@ -10,6 +11,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -18,7 +21,6 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -32,11 +34,13 @@ import com.whyraya.pokemon.model.dto.PokemonDto
 import com.whyraya.pokemon.model.dto.PokemonMoveDto
 import com.whyraya.pokemon.ui.screen.common.ErrorColumn
 import com.whyraya.pokemon.ui.screen.common.LoadingColumn
+import com.whyraya.pokemon.ui.screen.common.PokemonAppBar
 import com.whyraya.pokemon.ui.screen.common.RotatingPokeBall
 
 val LocalVibrantColor =
     compositionLocalOf<Animatable<Color, AnimationVector4D>> { error("No vibrant color defined") }
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun PokemonDetailScreen(viewModel: PokemonDetailViewModel) {
     val uiState = viewModel.uiState.collectAsState().value
@@ -52,46 +56,71 @@ fun PokemonDetailScreen(viewModel: PokemonDetailViewModel) {
             CompositionLocalProvider(
                 LocalVibrantColor provides vibrantColor
             ) {
-                ConstraintLayout(
-                    Modifier
-                        .fillMaxSize()
-                        .background(MaterialTheme.colors.surface)
-                        .verticalScroll(rememberScrollState()).padding(bottom = 56.dp)
-                ) {
-                    val (header, pokemonBall, pokemonImage, pokemonMove) = createRefs()
-                    val startGuideline = createGuidelineFromStart(16.dp)
-                    val endGuideline = createGuidelineFromEnd(16.dp)
-                    Header(pokemon = uiState.pokemon, modifier = Modifier.constrainAs(header) {})
-                    RotatingPokeBall(
-                        modifier = Modifier
-                            .size(280.dp)
-                            .constrainAs(pokemonBall) {
-                                top.linkTo(header.bottom, 8.dp)
-                                linkTo(startGuideline, endGuideline)
-                            },
-                        alpha = 0.5f
-                    )
-                    PokemonImage(
-                        pokemon = uiState.pokemon,
-                        modifier = Modifier
-                            .size(180.dp)
-                            .constrainAs(pokemonImage) {
-                                centerHorizontallyTo(pokemonBall)
-                                centerVerticallyTo(pokemonBall)
-                                linkTo(startGuideline, endGuideline)
+                Scaffold(
+                    modifier = Modifier
+                        .statusBarsPadding()
+                        .background(MaterialTheme.colors.surface),
+                    topBar = {
+                        Surface(modifier = Modifier.fillMaxWidth(), elevation = 16.dp) {
+                            Column(
+                                Modifier
+                                    .background(MaterialTheme.colors.surface)
+                                    .padding(bottom = 2.dp),
+                            ) {
+                                PokemonAppBar(uiState.pokemon.name)
                             }
-                    )
-
-                    PokemonMove(
-                        moves = uiState.pokemon.moves,
-                        modifier = Modifier.constrainAs(pokemonMove) {
-                            top.linkTo(pokemonBall.bottom, 8.dp)
-                            linkTo(startGuideline, endGuideline)
                         }
-                    )
-                }
+                    },
+                    content = {
+                        PokemonDetailContent(uiState.pokemon)
+                    }
+                )
             }
+
         }
+    }
+}
+
+@Composable
+fun PokemonDetailContent(pokemon: PokemonDto) {
+    ConstraintLayout(
+        Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colors.surface)
+            .verticalScroll(rememberScrollState())
+            .padding(bottom = 56.dp)
+    ) {
+        val (header, pokemonBall, pokemonImage, pokemonMove) = createRefs()
+        val startGuideline = createGuidelineFromStart(16.dp)
+        val endGuideline = createGuidelineFromEnd(16.dp)
+        Header(pokemon = pokemon, modifier = Modifier.constrainAs(header) {})
+        RotatingPokeBall(
+            modifier = Modifier
+                .size(280.dp)
+                .constrainAs(pokemonBall) {
+                    top.linkTo(header.bottom)
+                    linkTo(startGuideline, endGuideline)
+                },
+            alpha = 0.5f
+        )
+        PokemonImage(
+            pokemon = pokemon,
+            modifier = Modifier
+                .size(180.dp)
+                .constrainAs(pokemonImage) {
+                    centerHorizontallyTo(pokemonBall)
+                    centerVerticallyTo(pokemonBall)
+                    linkTo(startGuideline, endGuideline)
+                }
+        )
+
+        PokemonMove(
+            moves = pokemon.moves,
+            modifier = Modifier.constrainAs(pokemonMove) {
+                top.linkTo(pokemonBall.bottom, 8.dp)
+                linkTo(startGuideline, endGuideline)
+            }
+        )
     }
 }
 
@@ -102,34 +131,8 @@ private fun Header(
     pokemon: PokemonDto
 ) {
     Column(
-        modifier.padding(top = 40.dp, bottom = 32.dp, start = 24.dp, end = 24.dp)
+        modifier.padding(top = 21.dp, bottom = 16.dp, start = 24.dp, end = 24.dp)
     ) {
-        Row(
-            Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = pokemon.name,
-                style = MaterialTheme.typography.h4.copy(
-                    letterSpacing = 2.sp,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = FontFamily.SansSerif
-                ),
-                modifier = Modifier.alignByBaseline()
-            )
-            Text(
-                text = stringResource(R.string.app_pokemon_id, pokemon.formatId),
-                style = MaterialTheme.typography.h4.copy(
-                    letterSpacing = 2.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    fontFamily = FontFamily.SansSerif
-                ),
-                modifier = Modifier
-                    .alignByBaseline()
-                    .graphicsLayer { alpha = 0.75f }
-            )
-        }
-        Spacer(Modifier.height(8.dp))
         FlowRow(
             modifier = modifier
                 .fillMaxWidth(),
@@ -184,7 +187,11 @@ private fun PokemonMove(moves: List<PokemonMoveDto>, modifier: Modifier) {
         ) {
             moves.map {
                 Text(
-                    text = stringResource(R.string.app_pokemon_level, it.levelLearnedAt.toString(), it.move.name),
+                    text = stringResource(
+                        R.string.app_pokemon_level,
+                        it.levelLearnedAt.toString(),
+                        it.move.name
+                    ),
                     style = MaterialTheme.typography.subtitle1.copy(letterSpacing = 2.sp),
                     modifier = Modifier
                         .border(1.25.dp, LocalVibrantColor.current.value, RoundedCornerShape(50))

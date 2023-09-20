@@ -1,28 +1,32 @@
 package com.whyraya.pokemon.ui.screen.home
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Card
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.whyraya.pokemon.R
 import com.whyraya.pokemon.model.dto.PokemonDto
 import com.whyraya.pokemon.ui.screen.common.PokeBall
 
-@OptIn(ExperimentalGlideComposeApi::class)
+@OptIn(ExperimentalGlideComposeApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun PokemonCard(
     modifier: Modifier = Modifier,
@@ -30,36 +34,45 @@ fun PokemonCard(
     isFavorite: Boolean = false,
     onPokemonSelected: (PokemonDto) -> Unit = {}
 ) {
-    Surface(
-        modifier = modifier,
-        shape = MaterialTheme.shapes.large,
+    Card(
+        modifier = modifier.height(110.dp),
+        shape = RoundedCornerShape(size = 8.dp),
+        elevation = 8.dp,
+        onClick = { onPokemonSelected(pokemon) },
     ) {
         Box(
-            modifier
-                .height(120.dp)
-                .clickable { onPokemonSelected(pokemon) }
+            modifier = Modifier.fillMaxHeight()
         ) {
             Column(
                 Modifier.padding(top = 24.dp, start = 12.dp)
             ) {
-                PokemonName(pokemon.name)
+                Text(
+                    text = pokemon.name,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily.SansSerif,
+                    fontSize = 14.sp,
+                    modifier = Modifier
+                        .padding(top = 10.dp)
+                        .graphicsLayer {
+                            alpha = 0.5f
+                        },
+                )
+                Text(
+                    text = stringResource(R.string.app_pokemon_id, pokemon.formatId),
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily.SansSerif,
+                    fontSize = 14.sp,
+                    modifier = Modifier
+                        .padding(top = 10.dp)
+                        .graphicsLayer {
+                            alpha = 0.5f
+                        },
+                )
             }
-            Text(
-                text = pokemon.formatId,
-                fontWeight = FontWeight.Bold,
-                fontSize = 14.sp,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(top = 10.dp, end = 12.dp)
-                    .graphicsLayer {
-                        alpha = 0.5f
-                    },
-            )
             PokeBall(
                 modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .offset(x = 5.dp, y = 10.dp)
-                    .requiredSize(96.dp),
+                    .align(Alignment.CenterEnd)
+                    .requiredSize(96.dp).offset(x = 24.dp),
                 alpha = 0.25f
             )
 
@@ -67,8 +80,8 @@ fun PokemonCard(
                 model = pokemon.imageUrl,
                 contentDescription = pokemon.imageUrl,
                 Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(bottom = 6.dp, end = 6.dp)
+                    .align(Alignment.CenterEnd)
+                    .padding(bottom = 6.dp)
                     .size(80.dp)
             )
             if (isFavorite) {
@@ -82,15 +95,6 @@ fun PokemonCard(
             }
         }
     }
-}
-
-@Composable
-private fun PokemonName(name: String?) {
-    Text(
-        text = name ?: "",
-        fontWeight = FontWeight.Bold,
-        fontSize = 14.sp,
-    )
 }
 
 @Preview(uiMode = UI_MODE_NIGHT_YES)
