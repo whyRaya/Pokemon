@@ -11,12 +11,12 @@ class BasePagingSource<V : Any>(
 ) : PagingSource<Int, V>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, V> {
-        val pageNumber = params.key ?: 1
+        val pageNumber = params.key ?: 0
         return try {
             val response = block(pageNumber)
             LoadResult.Page(
                 data = response,
-                prevKey = if (response.isEmpty() || pageNumber == 1) null else pageNumber.dec(),
+                prevKey = if (response.isEmpty() || pageNumber == 0) null else pageNumber.dec(),
                 nextKey = if (response.isEmpty()) null else pageNumber.inc()
             )
         } catch (e: Exception) {

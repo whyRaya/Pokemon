@@ -6,8 +6,8 @@ import androidx.paging.PagingConfig
 /**
  * https://medium.com/@raya.wahyu.anggara/generic-paging-source-for-android-pagination-b5bbf55f0c81
  * */
-fun <V : Any> withPager(request: suspend (Int) -> List<V>) = createPager(
-    pageSize = LIMIT,
+fun <V : Any> withPager(pageSize: Int, request: suspend (Int) -> List<V>) = createPager(
+    pageSize = pageSize,
     prefetchDistance = PRE_FETCH_DISTANCE
 ) {
     request(it)
@@ -16,7 +16,7 @@ fun <V : Any> withPager(request: suspend (Int) -> List<V>) = createPager(
 fun <V : Any> createPager(
     pageSize: Int = 0,
     prefetchDistance: Int = 0,
-    enablePlaceholders: Boolean = false,
+    enablePlaceholders: Boolean = true,
     request: suspend (Int) -> List<V>
 ): Pager<Int, V> = Pager(
     config = PagingConfig(
@@ -27,5 +27,4 @@ fun <V : Any> createPager(
     pagingSourceFactory = { BasePagingSource(request) }
 )
 
-private const val LIMIT = 10
-private const val PRE_FETCH_DISTANCE = 2
+private const val PRE_FETCH_DISTANCE = 6
