@@ -1,6 +1,7 @@
 package com.whyraya.pokemon.ui.screen.common
 
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -36,6 +37,28 @@ fun RotatingPokeBall(
             rotationZ = angle
         },
         alpha = alpha
+    )
+}
+
+@Composable
+fun ScalingPokeBall(
+    modifier: Modifier = Modifier,
+    fromSize: Float,
+    toSize: Float,
+    duration: Int = 2000
+) {
+    val infiniteTransition = rememberInfiniteTransition()
+    val size by infiniteTransition.animateFloat(
+        initialValue = fromSize, targetValue = toSize, animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = duration, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
+    PokeBall(
+        modifier = modifier.graphicsLayer {
+            scaleX = size
+            scaleY = size
+        }
     )
 }
 

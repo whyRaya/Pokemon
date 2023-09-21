@@ -7,6 +7,7 @@ import com.whyraya.pokemon.domain.PokemonRepository
 import com.whyraya.pokemon.model.dto.PokemonDto
 import com.whyraya.pokemon.ui.navigation.POKEMON_ID
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -40,9 +41,21 @@ class PokemonDetailViewModel @Inject constructor(
             _uiState.value = _uiState.value.copy(error = exception, loading = false)
         }
     }
+
+    fun catchPokemon() = viewModelScope.launch {
+        _uiState.value = _uiState.value.copy(catchPokemonLoading = true)
+        delay(1500)
+        _uiState.value = _uiState.value.copy(
+            catchPokemonLoading = false,
+            pokemon = _uiState.value.pokemon?.copy(owned = true)
+        )
+    }
+
     data class PokemonDetailUiState(
         val pokemon: PokemonDto? = null,
         val loading: Boolean = false,
-        val error: Throwable? = null
+        val error: Throwable? = null,
+        val catchPokemonLoading: Boolean = false,
+        val catchPokemonResult: Boolean = false,
     )
 }

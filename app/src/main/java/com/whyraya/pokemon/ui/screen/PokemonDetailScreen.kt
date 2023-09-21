@@ -2,10 +2,15 @@ package com.whyraya.pokemon.ui.screen
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.Animatable
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector4D
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -36,6 +41,7 @@ import com.whyraya.pokemon.ui.screen.common.ErrorColumn
 import com.whyraya.pokemon.ui.screen.common.LoadingColumn
 import com.whyraya.pokemon.ui.screen.common.PokemonAppBar
 import com.whyraya.pokemon.ui.screen.common.RotatingPokeBall
+import com.whyraya.pokemon.ui.screen.common.ScalingPokeBall
 
 val LocalVibrantColor =
     compositionLocalOf<Animatable<Color, AnimationVector4D>> { error("No vibrant color defined") }
@@ -72,7 +78,27 @@ fun PokemonDetailScreen(viewModel: PokemonDetailViewModel) {
                         }
                     },
                     content = {
-                        PokemonDetailContent(uiState.pokemon)
+                        Box {
+                            PokemonDetailContent(uiState.pokemon) {
+                                viewModel.catchPokemon()
+                            }
+                            AnimatedVisibility(
+                                visible = uiState.catchPokemonLoading,
+                                enter = fadeIn(
+                                    initialAlpha = 0.6f
+                                ),
+                                exit = fadeOut(
+                                    animationSpec = tween(durationMillis = 250)
+                                )
+                            ) {
+                                LoadingColumn(
+                                    title = "",
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(color = Color(0xA6282829))
+                                )
+                            }
+                        }
                     }
                 )
             }
@@ -82,7 +108,10 @@ fun PokemonDetailScreen(viewModel: PokemonDetailViewModel) {
 }
 
 @Composable
-fun PokemonDetailContent(pokemon: PokemonDto) {
+fun PokemonDetailContent(
+    pokemon: PokemonDto,
+    catchPokemon: () -> Unit = {}
+) {
     ConstraintLayout(
         Modifier
             .fillMaxSize()
@@ -90,7 +119,7 @@ fun PokemonDetailContent(pokemon: PokemonDto) {
             .verticalScroll(rememberScrollState())
             .padding(bottom = 56.dp)
     ) {
-        val (header, pokemonBall, pokemonImage, pokemonMove) = createRefs()
+        val (header, pokemonBall, pokemonImage, pokemonMove, catchButton, owned) = createRefs()
         val startGuideline = createGuidelineFromStart(16.dp)
         val endGuideline = createGuidelineFromEnd(16.dp)
         Header(pokemon = pokemon, modifier = Modifier.constrainAs(header) {})
@@ -113,7 +142,34 @@ fun PokemonDetailContent(pokemon: PokemonDto) {
                     linkTo(startGuideline, endGuideline)
                 }
         )
-
+        if (pokemon.owned) {
+            Text(
+                text = stringResource(R.string.app_pokemon_owned),
+                style = MaterialTheme.typography.h5.copy(letterSpacing = 2.sp, color = Color.White),
+                modifier = Modifier
+                    .background(color = Color(0xFF3F51B5), RoundedCornerShape(16.dp))
+                    .padding(horizontal = 16.dp, vertical = 4.dp)
+                    .constrainAs(owned) {
+                        top.linkTo(pokemonImage.bottom)
+                        linkTo(startGuideline, endGuideline)
+                    },
+            )
+        } else {
+            ScalingPokeBall(
+                modifier = Modifier
+                    .size(56.dp)
+                    .clickable {
+                        catchPokemon.invoke()
+                    }
+                    .constrainAs(catchButton) {
+                        top.linkTo(pokemonImage.bottom)
+                        linkTo(startGuideline, endGuideline)
+                    },
+                fromSize = 1.0f,
+                toSize = 1.1f,
+                duration = 1200
+            )
+        }
         PokemonMove(
             moves = pokemon.moves,
             modifier = Modifier.constrainAs(pokemonMove) {
