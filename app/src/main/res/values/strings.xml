@@ -7,4 +7,7 @@
     <string name="app_pokemon_owned">Owned</string>
     <string name="app_pokemon_catch_failed">Catch Pokemon Failed!</string>
     <string name="app_pokemon_catch_success">Congratulation</string>
+    <string name="app_pokemon_nickname">Your Pokemon Nickname</string>
+    <string name="app_submit">Submit</string>
+    <string name="app_skip">Skip</string>
 </resources>

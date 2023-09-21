@@ -15,18 +15,25 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -50,12 +57,15 @@ import com.whyraya.pokemon.ui.screen.common.ScalingPokeBall
 val LocalVibrantColor =
     compositionLocalOf<Animatable<Color, AnimationVector4D>> { error("No vibrant color defined") }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun PokemonDetailScreen(viewModel: PokemonDetailViewModel) {
     val uiState = viewModel.uiState.collectAsState().value
     val scaffoldState: ScaffoldState = rememberScaffoldState()
     val context = LocalContext.current
+    val openDialog = remember { mutableStateOf(false) }
+    var text by remember { mutableStateOf("") }
     when {
         uiState.loading -> LoadingColumn(stringResource(id = R.string.app_loading))
         uiState.error != null -> ErrorColumn(uiState.error.message.orEmpty()) {
@@ -108,9 +118,51 @@ fun PokemonDetailScreen(viewModel: PokemonDetailViewModel) {
                         }
                     }
                 )
+                if (openDialog.value) {
+                    AlertDialog(
+                        onDismissRequest = {
+                            openDialog.value = false
+                        },
+                        title = {
+                            Text(text = stringResource(id = R.string.app_pokemon_catch_success), modifier = Modifier.padding(bottom = 54.dp))
+                        },
+                        text = {
+                            Column(modifier = Modifier.padding(top = 21.dp)) {
+                                Spacer(modifier = Modifier.size(60.dp))
+                                TextField(
+                                    value = text,
+                                    onValueChange = { text = it }
+                                )
+                                Spacer(modifier = Modifier.size(8.dp))
+                                Text(stringResource(id = R.string.app_pokemon_nickname))
+                            }
+                        },
+                        buttons = {
+                            Row(
+                                modifier = Modifier.padding(all = 8.dp).fillMaxWidth(),
+                                horizontalArrangement = Arrangement.End
+                            ) {
+                                TextButton(
+                                    onClick = {
+                                        openDialog.value = false
+                                    }
+                                ) {
+                                    Text(stringResource(id = R.string.app_skip))
+                                }
+                                Spacer(modifier = Modifier.size(8.dp))
+                                TextButton(
+                                    onClick = { openDialog.value = false }
+                                ) {
+                                    Text(stringResource(id = R.string.app_submit))
+                                }
+                            }
+                        }
+                    )
+                }
                 if (uiState.catchPokemonLoading.not() && uiState.catchPokemonResult != null) {
                     LaunchedEffect(scaffoldState.snackbarHostState) {
                         val message = if (uiState.catchPokemonResult.status) {
+                            openDialog.value = true
                             R.string.app_pokemon_catch_success
                         } else {
                             R.string.app_pokemon_catch_failed
