@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.whyraya.pokemon.domain.PokemonRepository
+import com.whyraya.pokemon.model.dto.PokemonCatchDto
 import com.whyraya.pokemon.model.dto.PokemonDto
 import com.whyraya.pokemon.ui.navigation.POKEMON_ID
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -42,13 +43,16 @@ class PokemonDetailViewModel @Inject constructor(
         }
     }
 
-    fun catchPokemon() = viewModelScope.launch {
+    fun catchPokemon(pokemon: PokemonDto) = viewModelScope.launch {
         _uiState.value = _uiState.value.copy(catchPokemonLoading = true)
-        delay(1500)
-        _uiState.value = _uiState.value.copy(
-            catchPokemonLoading = false,
-            pokemon = _uiState.value.pokemon?.copy(owned = true)
-        )
+        pokemonRepository.catchPokemon(pokemon).collect {
+            _uiState.value = _uiState.value.copy(
+                pokemon = it.pokemonDto,
+                catchPokemonLoading = false,
+                catchPokemonResult = it
+
+            )
+        }
     }
 
     data class PokemonDetailUiState(
@@ -56,6 +60,6 @@ class PokemonDetailViewModel @Inject constructor(
         val loading: Boolean = false,
         val error: Throwable? = null,
         val catchPokemonLoading: Boolean = false,
-        val catchPokemonResult: Boolean = false,
+        val catchPokemonResult: PokemonCatchDto? = null,
     )
 }

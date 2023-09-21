@@ -5,4 +5,6 @@
     <string name="app_pokemon_moves">Moves</string>
     <string name="app_pokemon_level">Lv%1s: %2s</string>
     <string name="app_pokemon_owned">Owned</string>
+    <string name="app_pokemon_catch_failed">Catch Pokemon Failed!</string>
+    <string name="app_pokemon_catch_success">Congratulation</string>
 </resources>

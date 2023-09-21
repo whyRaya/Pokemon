@@ -17,15 +17,19 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -50,6 +54,8 @@ val LocalVibrantColor =
 @Composable
 fun PokemonDetailScreen(viewModel: PokemonDetailViewModel) {
     val uiState = viewModel.uiState.collectAsState().value
+    val scaffoldState: ScaffoldState = rememberScaffoldState()
+    val context = LocalContext.current
     when {
         uiState.loading -> LoadingColumn(stringResource(id = R.string.app_loading))
         uiState.error != null -> ErrorColumn(uiState.error.message.orEmpty()) {
@@ -63,6 +69,7 @@ fun PokemonDetailScreen(viewModel: PokemonDetailViewModel) {
                 LocalVibrantColor provides vibrantColor
             ) {
                 Scaffold(
+                    scaffoldState = scaffoldState,
                     modifier = Modifier
                         .statusBarsPadding()
                         .background(MaterialTheme.colors.surface),
@@ -80,7 +87,7 @@ fun PokemonDetailScreen(viewModel: PokemonDetailViewModel) {
                     content = {
                         Box {
                             PokemonDetailContent(uiState.pokemon) {
-                                viewModel.catchPokemon()
+                                viewModel.catchPokemon(uiState.pokemon)
                             }
                             AnimatedVisibility(
                                 visible = uiState.catchPokemonLoading,
@@ -101,6 +108,18 @@ fun PokemonDetailScreen(viewModel: PokemonDetailViewModel) {
                         }
                     }
                 )
+                if (uiState.catchPokemonLoading.not() && uiState.catchPokemonResult != null) {
+                    LaunchedEffect(scaffoldState.snackbarHostState) {
+                        val message = if (uiState.catchPokemonResult.status) {
+                            R.string.app_pokemon_catch_success
+                        } else {
+                            R.string.app_pokemon_catch_failed
+                        }
+                        scaffoldState.snackbarHostState.showSnackbar(
+                            message = context.resources.getString(message)
+                        )
+                    }
+                }
             }
 
         }
