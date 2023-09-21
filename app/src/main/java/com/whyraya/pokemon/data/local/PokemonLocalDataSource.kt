@@ -1,4 +1,6 @@
 package com.whyraya.pokemon.data.local
 
-class PokemonLocalDataSource(val db: PokemonDao) {
+import javax.inject.Inject
+
+class PokemonLocalDataSource @Inject constructor(val db: PokemonDao) {
 }

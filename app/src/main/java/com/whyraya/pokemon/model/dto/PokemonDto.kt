@@ -9,6 +9,7 @@ data class PokemonDto(
     val weight: Int = 0,
     val height: Int = 0,
     val baseExperience: Int = 0,
+    val owned: Boolean = false,
     val stats: List<PokemonStatDto> = emptyList(), // hp, atk, def, etc
     val types: List<PokemonTypeDto> = emptyList(), // grass, fire, etc
     val moves: List<PokemonMoveDto> = emptyList()  // overgrow, chlorophyll

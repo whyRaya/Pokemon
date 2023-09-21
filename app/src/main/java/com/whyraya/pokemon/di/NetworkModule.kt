@@ -1,5 +1,6 @@
 package com.whyraya.pokemon.di
 
+import com.google.gson.Gson
 import com.whyraya.pokemon.data.remote.PokemonApiServices
 import dagger.Module
 import dagger.Provides
@@ -18,6 +19,12 @@ object NetworkModule {
 
     private const val BASE_URL = "https://pokeapi.co/api/v2/"
     private const val REQUEST_TIMEOUT = 10L
+
+    @Singleton
+    @Provides
+    fun provideGson(): Gson {
+        return Gson()
+    }
 
     @Provides
     @Singleton
